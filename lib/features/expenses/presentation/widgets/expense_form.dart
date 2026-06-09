@@ -1,0 +1,141 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../../../app/theme/neo_spacing.dart';
+import '../../../../core/widgets/neo_button.dart';
+import '../../../../core/widgets/neo_currency_input.dart';
+import '../../../../core/widgets/neo_date_picker_field.dart';
+import '../../../../core/widgets/neo_input.dart';
+import 'account_source_picker.dart';
+import 'expense_category_picker.dart';
+
+class ExpenseForm extends StatefulWidget {
+  const ExpenseForm({super.key, required this.onSubmit});
+
+  final VoidCallback onSubmit;
+
+  @override
+  State<ExpenseForm> createState() => _ExpenseFormState();
+}
+
+class _ExpenseFormState extends State<ExpenseForm> {
+  final formKey = GlobalKey<FormState>();
+  late final TextEditingController titleController;
+  late final TextEditingController amountController;
+  late DateTime selectedDate;
+  late ExpenseCategoryOption selectedCategory;
+  String selectedAccountSource = 'Cash';
+
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    amountController = TextEditingController();
+    selectedDate = DateTime.now();
+    selectedCategory = expenseCategoryOptions.first;
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          NeoDatePickerField(
+            value: DateFormat('dd MMM yyyy').format(selectedDate),
+            onTap: _pickDate,
+          ),
+          const SizedBox(height: NeoSpacing.xl),
+          NeoCurrencyInput(
+            controller: amountController,
+            validator: _validateAmount,
+          ),
+          const SizedBox(height: NeoSpacing.xl),
+          ExpenseCategoryPicker(
+            selectedCategory: selectedCategory,
+            onChanged: (category) {
+              setState(() => selectedCategory = category);
+            },
+          ),
+          const SizedBox(height: NeoSpacing.xl),
+          AccountSourcePicker(
+            selectedSource: selectedAccountSource,
+            onChanged: (source) {
+              setState(() => selectedAccountSource = source);
+            },
+          ),
+          const SizedBox(height: NeoSpacing.xl),
+          NeoInput(
+            label: 'Title',
+            hintText: 'Enter expense title',
+            controller: titleController,
+            textInputAction: TextInputAction.done,
+            validator: _validateTitle,
+          ),
+          const SizedBox(height: NeoSpacing.xxl),
+          NeoButton(label: 'SAVE EXPENSE', onPressed: _submit),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null && mounted) {
+      setState(() => selectedDate = pickedDate);
+    }
+  }
+
+  void _submit() {
+    if (formKey.currentState?.validate() ?? false) {
+      widget.onSubmit();
+    }
+  }
+
+  String? _validateTitle(String? value) {
+    final title = value?.trim() ?? '';
+
+    if (title.isEmpty) {
+      return 'Title is required.';
+    }
+
+    if (title.length < 2) {
+      return 'Title must be at least 2 characters.';
+    }
+
+    return null;
+  }
+
+  String? _validateAmount(String? value) {
+    final raw = value?.trim().replaceAll(',', '') ?? '';
+
+    if (raw.isEmpty) {
+      return 'Amount is required.';
+    }
+
+    final amount = double.tryParse(raw);
+
+    if (amount == null) {
+      return 'Amount must be a valid number.';
+    }
+
+    if (amount <= 0) {
+      return 'Amount must be greater than 0.';
+    }
+
+    return null;
+  }
+}
