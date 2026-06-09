@@ -157,6 +157,20 @@ lib/
 | `/expenses/:id` | Expense detail |
 | `/expenses/:id/edit` | Edit expense |
 
+## Screenshots
+
+| Splash Screen | Empty State |
+| --- | --- |
+| <img src="docs/screenshots/Screenshot_1781022890.png" width="240" /> | <img src="docs/screenshots/Screenshot_1781022945.png" width="240" /> |
+
+| Add Expense Screen | Edit Expense Screen |
+| --- | --- |
+| <img src="docs/screenshots/Screenshot_1781023141.png" width="240" /> | <img src="docs/screenshots/Screenshot_1781023314.png" width="240" /> |
+
+| List Expense Screen | Expense Detail Screen |
+| --- | --- |
+| <img src="docs/screenshots/Screenshot_1781023174.png" width="240" /> | <img src="docs/screenshots/Screenshot_1781023180.png" width="240" /> |
+
 ## Currency Format
 
 All expense amounts are displayed in Ringgit Malaysia format.
