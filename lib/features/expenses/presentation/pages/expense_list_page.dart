@@ -4,7 +4,6 @@ import '../../../../app/theme/neo_colors.dart';
 import '../../../../app/theme/neo_dimens.dart';
 import '../../../../app/theme/neo_spacing.dart';
 import '../../../../app/theme/neo_text_styles.dart';
-import '../../../../core/widgets/neo_snackbar.dart';
 import '../widgets/expense_card.dart';
 import '../widgets/expense_summary_card.dart';
 
@@ -47,10 +46,7 @@ class ExpenseListPage extends StatelessWidget {
                         metadata: expense.metadata,
                         amount: expense.amount,
                         color: expense.color,
-                        onTap: () => NeoSnackbar.info(
-                          context,
-                          '${expense.title} selected.',
-                        ),
+                        onTap: () => context.push('/expenses/${expense.id}'),
                       ),
                       const SizedBox(height: NeoSpacing.md),
                     ],
@@ -67,6 +63,7 @@ class ExpenseListPage extends StatelessWidget {
 
 class _DummyExpense {
   const _DummyExpense({
+    required this.id,
     required this.icon,
     required this.title,
     required this.metadata,
@@ -74,6 +71,7 @@ class _DummyExpense {
     required this.color,
   });
 
+  final String id;
   final IconData icon;
   final String title;
   final String metadata;
@@ -83,6 +81,7 @@ class _DummyExpense {
 
 const _dummyExpenses = [
   _DummyExpense(
+    id: '1',
     icon: Icons.restaurant_rounded,
     title: 'Lunch',
     metadata: 'Food · Cash · 12:30',
@@ -90,6 +89,7 @@ const _dummyExpenses = [
     color: NeoColors.categoryFood,
   ),
   _DummyExpense(
+    id: '2',
     icon: Icons.directions_car_rounded,
     title: 'Ride to office',
     metadata: 'Transport · E-wallet · 08:15',
@@ -97,6 +97,7 @@ const _dummyExpenses = [
     color: NeoColors.categoryTransport,
   ),
   _DummyExpense(
+    id: '3',
     icon: Icons.receipt_rounded,
     title: 'Internet bill',
     metadata: 'Bills · Bank · 21:10',

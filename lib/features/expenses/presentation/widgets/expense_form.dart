@@ -9,9 +9,24 @@ import 'account_source_picker.dart';
 import 'expense_category_picker.dart';
 
 class ExpenseForm extends StatefulWidget {
-  const ExpenseForm({super.key, required this.onSubmit});
+  const ExpenseForm({
+    super.key,
+    required this.onSubmit,
+    this.buttonLabel = 'SAVE EXPENSE',
+    this.initialTitle,
+    this.initialAmount,
+    this.initialDate,
+    this.initialCategoryName,
+    this.initialAccountSource,
+  });
 
   final VoidCallback onSubmit;
+  final String buttonLabel;
+  final String? initialTitle;
+  final String? initialAmount;
+  final DateTime? initialDate;
+  final String? initialCategoryName;
+  final String? initialAccountSource;
 
   @override
   State<ExpenseForm> createState() => _ExpenseFormState();
@@ -28,10 +43,18 @@ class _ExpenseFormState extends State<ExpenseForm> {
   @override
   void initState() {
     super.initState();
-    titleController = TextEditingController();
-    amountController = TextEditingController();
-    selectedDate = DateTime.now();
-    selectedCategory = expenseCategoryOptions.first;
+    titleController = TextEditingController(text: widget.initialTitle);
+    amountController = TextEditingController(text: widget.initialAmount);
+    selectedDate = widget.initialDate ?? DateTime.now();
+    if (widget.initialCategoryName case final name?) {
+      selectedCategory = expenseCategoryOptions.firstWhere(
+        (c) => c.name == name,
+        orElse: () => expenseCategoryOptions.first,
+      );
+    } else {
+      selectedCategory = expenseCategoryOptions.first;
+    }
+    selectedAccountSource = widget.initialAccountSource ?? 'Cash';
   }
 
   @override
@@ -80,7 +103,7 @@ class _ExpenseFormState extends State<ExpenseForm> {
             validator: _validateTitle,
           ),
           const SizedBox(height: NeoSpacing.xxl),
-          NeoButton(label: 'SAVE EXPENSE', onPressed: _submit),
+          NeoButton(label: widget.buttonLabel, onPressed: _submit),
         ],
       ),
     );
