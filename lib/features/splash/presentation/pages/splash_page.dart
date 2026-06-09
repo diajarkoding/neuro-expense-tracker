@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/router/route_paths.dart';
 import '../../../../app/theme/neo_colors.dart';
 import '../../../../app/theme/neo_text_styles.dart';
 import '../../../../app/theme/neo_spacing.dart';
@@ -17,7 +18,7 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
-        context.go('/expenses');
+        context.go(RoutePaths.expenses);
       }
     });
   }

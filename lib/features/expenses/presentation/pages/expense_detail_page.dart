@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../app/router/route_paths.dart';
 import '../../../../app/theme/neo_colors.dart';
 import '../../../../app/theme/neo_dimens.dart';
 import '../../../../app/theme/neo_spacing.dart';
 import '../../../../app/theme/neo_text_styles.dart';
 import '../../../../core/widgets/neo_button.dart';
 import '../../../../core/widgets/neo_card.dart';
+import '../../../../core/widgets/neo_confirm_dialog.dart';
 import '../../../../core/widgets/neo_snackbar.dart';
 
 class ExpenseDetailPage extends StatelessWidget {
@@ -43,7 +45,7 @@ class ExpenseDetailPage extends StatelessWidget {
                   ),
                   NeoIconActionButton(
                     icon: Icons.edit_rounded,
-                    onPressed: () => context.push('/expenses/$id/edit'),
+                    onPressed: () => context.push(RoutePaths.editExpense(id)),
                   ),
                 ],
               ),
@@ -113,58 +115,26 @@ class ExpenseDetailPage extends StatelessWidget {
               NeoButton(
                 label: 'DELETE EXPENSE',
                 backgroundColor: NeoColors.expenseRed,
-                onPressed: () => _confirmDelete(context),
+                onPressed: () {
+                  NeoConfirmDialog.show(
+                    context: context,
+                    title: 'Delete Expense',
+                    message: 'Are you sure you want to delete this expense?',
+                    confirmLabel: 'DELETE',
+                    isDestructive: true,
+                    onConfirm: () {
+                      NeoSnackbar.success(
+                        context,
+                        'Expense deleted successfully.',
+                      );
+                      context.pop();
+                    },
+                  );
+                },
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _confirmDelete(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: NeoColors.cardBackground,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeoDimens.cornerRadius),
-          side: const BorderSide(
-            color: NeoColors.pureBlack,
-            width: NeoDimens.borderWidth,
-          ),
-        ),
-        title: const Text('Delete Expense', style: NeoTextStyles.titleMedium),
-        content: const Text(
-          'Are you sure you want to delete this expense?',
-          style: NeoTextStyles.bodyMedium,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(
-                color: NeoColors.mediumGray,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              NeoSnackbar.success(context, 'Expense deleted successfully.');
-              context.pop();
-            },
-            child: const Text(
-              'DELETE',
-              style: TextStyle(
-                color: NeoColors.expenseRed,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

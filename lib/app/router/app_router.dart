@@ -4,26 +4,30 @@ import '../../features/expenses/presentation/pages/add_expense_page.dart';
 import '../../features/expenses/presentation/pages/edit_expense_page.dart';
 import '../../features/expenses/presentation/pages/expense_detail_page.dart';
 import '../../features/expenses/presentation/pages/expense_list_page.dart';
+import 'route_paths.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: RoutePaths.splash,
   routes: [
-    GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
     GoRoute(
-      path: '/expenses',
+      path: RoutePaths.splash,
+      builder: (context, state) => const SplashPage(),
+    ),
+    GoRoute(
+      path: RoutePaths.expenses,
       builder: (context, state) => const ExpenseListPage(),
     ),
     GoRoute(
-      path: '/expenses/add',
+      path: RoutePaths.addExpense,
       builder: (context, state) => const AddExpensePage(),
     ),
     GoRoute(
-      path: '/expenses/:id',
+      path: RoutePaths.expenseDetailPattern,
       builder: (context, state) =>
           ExpenseDetailPage(id: state.pathParameters['id'] ?? ''),
     ),
     GoRoute(
-      path: '/expenses/:id/edit',
+      path: RoutePaths.editExpensePattern,
       builder: (context, state) =>
           EditExpensePage(id: state.pathParameters['id'] ?? ''),
     ),
