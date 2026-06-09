@@ -2,28 +2,38 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/neo_colors.dart';
 import '../../../../app/theme/neo_spacing.dart';
 import '../../../../app/theme/neo_text_styles.dart';
+import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/widgets/neo_card.dart';
 
 class ExpenseSummaryCard extends StatelessWidget {
-  const ExpenseSummaryCard({super.key});
+  const ExpenseSummaryCard({super.key, required this.totalExpense});
+
+  final double totalExpense;
 
   @override
   Widget build(BuildContext context) {
-    return const NeoCard(
+    return NeoCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('June 2026', style: NeoTextStyles.labelMedium),
-              _ExpenseBadge(),
+              Text(
+                DateFormatter.monthYear(DateTime.now()),
+                style: NeoTextStyles.labelMedium,
+              ),
+              const _ExpenseBadge(),
             ],
           ),
-          SizedBox(height: NeoSpacing.xl),
-          Text('RM 1,250.75', style: NeoTextStyles.moneyLargeTextStyle),
-          SizedBox(height: NeoSpacing.xs),
-          Text('Total expenses', style: NeoTextStyles.bodySmall),
+          const SizedBox(height: NeoSpacing.xl),
+          Text(
+            CurrencyFormatter.format(totalExpense),
+            style: NeoTextStyles.moneyLargeTextStyle,
+          ),
+          const SizedBox(height: NeoSpacing.xs),
+          const Text('Total expenses', style: NeoTextStyles.bodySmall),
         ],
       ),
     );

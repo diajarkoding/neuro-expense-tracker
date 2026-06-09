@@ -8,8 +8,7 @@ part 'expense_detail_provider.g.dart';
 class ExpenseDetailController extends _$ExpenseDetailController {
   @override
   ExpenseDetailState build(String id) {
-    Future.microtask(() => loadExpense(id));
-    return const ExpenseDetailState(isLoading: true);
+    return const ExpenseDetailState();
   }
 
   Future<void> loadExpense(String id) async {

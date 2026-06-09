@@ -6,34 +6,54 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_ce/hive_ce.dart';
 
 import 'package:neuro_expense_tracker/app/app.dart';
+import 'package:neuro_expense_tracker/core/constants/hive_box_names.dart';
 import 'package:neuro_expense_tracker/features/expenses/presentation/pages/add_expense_page.dart';
 import 'package:neuro_expense_tracker/features/expenses/presentation/pages/edit_expense_page.dart';
 import 'package:neuro_expense_tracker/features/expenses/presentation/pages/expense_detail_page.dart';
 import 'package:neuro_expense_tracker/features/expenses/presentation/pages/expense_list_page.dart';
 
 void main() {
-  testWidgets('App renders splash screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const NeuroExpenseApp());
+  setUpAll(() {
+    Hive.init('test_hive_box');
+  });
+
+  setUp(() async {
+    final box = await Hive.openBox<Map>(HiveBoxNames.expenses);
+    await box.clear();
+  });
+
+  tearDownAll(() async {
+    await Hive.deleteBoxFromDisk(HiveBoxNames.expenses);
+  });
+
+  testWidgets('App renders splash screen', (tester) async {
+    await tester.pumpWidget(const ProviderScope(child: NeuroExpenseApp()));
 
     expect(find.text('NeuroExpense'), findsOneWidget);
 
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
   });
 
-  testWidgets('Home page renders dashboard content', (tester) async {
-    await tester.pumpWidget(_wrap(const ExpenseListPage()));
+  testWidgets('Dashboard renders empty state when no expenses', (tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: ExpenseListPage())),
+    );
 
-    expect(find.text('Good morning,'), findsOneWidget);
-    expect(find.text('Total expenses'), findsOneWidget);
-    expect(find.text('09 Jun 2026'), findsOneWidget);
-    expect(find.text('08 Jun 2026'), findsOneWidget);
+    await _pumpAsync(tester);
+
+    expect(find.text('No expenses yet.'), findsOneWidget);
   });
 
   testWidgets('Add expense page renders form', (tester) async {
-    await tester.pumpWidget(_wrap(const AddExpensePage()));
+    await tester.pumpWidget(
+      const ProviderScope(child: MaterialApp(home: AddExpensePage())),
+    );
 
     expect(find.text('Add Expense'), findsOneWidget);
     expect(find.text('Amount'), findsOneWidget);
@@ -41,23 +61,41 @@ void main() {
     expect(find.text('SAVE EXPENSE'), findsOneWidget);
   });
 
-  testWidgets('Expense detail page renders detail content', (tester) async {
-    await tester.pumpWidget(_wrap(const ExpenseDetailPage(id: '1')));
+  testWidgets('Expense detail page renders not found for missing id', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(home: ExpenseDetailPage(id: 'missing')),
+      ),
+    );
 
-    expect(find.text('Expense Detail'), findsOneWidget);
-    expect(find.text('RM 125.50'), findsOneWidget);
-    expect(find.text('DELETE EXPENSE'), findsOneWidget);
+    await _pumpAsync(tester);
+
+    expect(find.text('Expense not found.'), findsOneWidget);
   });
 
-  testWidgets('Edit expense page renders prefilled form', (tester) async {
-    await tester.pumpWidget(_wrap(const EditExpensePage(id: '1')));
+  testWidgets('Edit expense page renders not found for missing id', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(home: EditExpensePage(id: 'missing')),
+      ),
+    );
 
-    expect(find.text('Edit Expense'), findsOneWidget);
-    expect(find.text('Lunch at cafe'), findsOneWidget);
-    expect(find.text('UPDATE EXPENSE'), findsOneWidget);
+    await _pumpAsync(tester);
+
+    expect(find.text('Expense not found.'), findsOneWidget);
   });
 }
 
-Widget _wrap(Widget child) {
-  return MaterialApp(home: child);
+Future<void> _pumpAsync(WidgetTester tester) async {
+  await tester.pump();
+  await tester.runAsync(
+    () => Future.delayed(const Duration(milliseconds: 100)),
+  );
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 100));
+  await tester.pump();
 }

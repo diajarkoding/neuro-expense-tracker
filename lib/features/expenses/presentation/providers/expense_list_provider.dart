@@ -8,8 +8,16 @@ part 'expense_list_provider.g.dart';
 class ExpenseListController extends _$ExpenseListController {
   @override
   ExpenseListState build() {
-    Future.microtask(loadExpenses);
-    return const ExpenseListState(isLoading: true);
+    return const ExpenseListState();
+  }
+
+  Future<void> init() async {
+    if (state.isLoading ||
+        state.expenses.isNotEmpty ||
+        state.errorMessage != null) {
+      return;
+    }
+    await loadExpenses();
   }
 
   Future<void> loadExpenses() async {

@@ -5,6 +5,9 @@ import '../../../../core/widgets/neo_button.dart';
 import '../../../../core/widgets/neo_currency_input.dart';
 import '../../../../core/widgets/neo_date_picker_field.dart';
 import '../../../../core/widgets/neo_input.dart';
+import '../providers/account_source_mapper.dart';
+import '../providers/expense_category_mapper.dart';
+import '../providers/expense_form_input.dart';
 import 'account_source_picker.dart';
 import 'expense_category_picker.dart';
 
@@ -18,15 +21,17 @@ class ExpenseForm extends StatefulWidget {
     this.initialDate,
     this.initialCategoryName,
     this.initialAccountSource,
+    this.isSubmitting = false,
   });
 
-  final VoidCallback onSubmit;
+  final ValueChanged<ExpenseFormInput> onSubmit;
   final String buttonLabel;
   final String? initialTitle;
   final String? initialAmount;
   final DateTime? initialDate;
   final String? initialCategoryName;
   final String? initialAccountSource;
+  final bool isSubmitting;
 
   @override
   State<ExpenseForm> createState() => _ExpenseFormState();
@@ -103,7 +108,11 @@ class _ExpenseFormState extends State<ExpenseForm> {
             validator: _validateTitle,
           ),
           const SizedBox(height: NeoSpacing.xxl),
-          NeoButton(label: widget.buttonLabel, onPressed: _submit),
+          NeoButton(
+            label: widget.isSubmitting ? 'SAVING...' : widget.buttonLabel,
+            isLoading: widget.isSubmitting,
+            onPressed: _submit,
+          ),
         ],
       ),
     );
@@ -124,8 +133,22 @@ class _ExpenseFormState extends State<ExpenseForm> {
 
   void _submit() {
     if (formKey.currentState?.validate() ?? false) {
-      widget.onSubmit();
+      widget.onSubmit(
+        ExpenseFormInput(
+          title: titleController.text.trim(),
+          amount: _parseAmount(amountController.text),
+          date: selectedDate,
+          category: selectedCategory.toDomain(),
+          accountSource: AccountSourceMapper.fromDisplayName(
+            selectedAccountSource,
+          ),
+        ),
+      );
     }
+  }
+
+  double _parseAmount(String value) {
+    return double.parse(value.trim().replaceAll(',', ''));
   }
 
   String? _validateTitle(String? value) {
