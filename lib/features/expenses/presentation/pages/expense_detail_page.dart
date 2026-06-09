@@ -73,7 +73,19 @@ class _ExpenseDetailPageState extends ConsumerState<ExpenseDetailPage> {
                     icon: Icons.edit_rounded,
                     onPressed: state.expense == null
                         ? null
-                        : () => context.push(RoutePaths.editExpense(widget.id)),
+                        : () async {
+                            await context.push(
+                              RoutePaths.editExpense(widget.id),
+                            );
+                            if (!context.mounted) return;
+                            ref
+                                .read(
+                                  expenseDetailControllerProvider(
+                                    widget.id,
+                                  ).notifier,
+                                )
+                                .loadExpense(widget.id);
+                          },
                   ),
                 ],
               ),
