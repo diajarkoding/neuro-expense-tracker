@@ -28,7 +28,7 @@ class ExpenseDetailPage extends StatelessWidget {
             NeoSpacing.xxl,
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 children: [
